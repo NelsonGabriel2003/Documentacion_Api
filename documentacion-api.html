@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentacion Tecnica - API Backend LuluncotoApp</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--verde:#2d5016;--verde-claro:#4a7c29;--azul:#87CEEB;--azul-oscuro:#5ba3c9;--beige:#f5f0e1;--beige-oscuro:#e8dcc8;--marron:#8B4513;--marron-claro:#a0522d;--crema:#faf8f0;--texto:#3a3a3a;--sombra:0 4px 16px rgba(45,80,22,0.12);--sombra-hover:0 8px 32px rgba(45,80,22,0.18)}
+html{scroll-behavior:smooth}
+body{font-family:'Source Sans Pro',sans-serif;color:var(--texto);background:var(--crema);line-height:1.7;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c5a9' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+h1,h2,h3,h4,h5{font-family:'Playfair Display',serif;color:var(--verde)}
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:linear-gradient(180deg,#1a3a0a 0%,var(--verde) 40%,#1f4010 100%);color:#fff;overflow-y:auto;z-index:1000;padding:20px 0;box-shadow:4px 0 20px rgba(0,0,0,0.2);transition:transform .3s ease}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:3px}
+.sidebar-header{text-align:center;padding:20px 20px 30px;border-bottom:1px solid rgba(255,255,255,0.15)}
+.sidebar-header h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff;margin-bottom:4px}
+.sidebar-header p{font-size:.75rem;color:rgba(255,255,255,0.65);font-style:italic}
+.sidebar-nav{padding:15px 0}
+.sidebar-nav a{display:block;padding:10px 25px;color:rgba(255,255,255,0.8);text-decoration:none;font-size:.88rem;transition:all .2s;border-left:3px solid transparent}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:var(--azul)}
+.sidebar-nav .nav-section{padding:12px 25px 6px;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.4);font-weight:700}
+.sidebar-toggle{display:none;position:fixed;top:15px;left:15px;z-index:1100;background:var(--verde);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:1.2rem;box-shadow:var(--sombra)}
+/* MAIN */
+.main{margin-left:280px;min-height:100vh}
+/* HERO */
+.hero{position:relative;background:linear-gradient(135deg,rgba(26,58,10,0.88),rgba(45,80,22,0.82)),url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80') center/cover no-repeat;color:#fff;padding:100px 60px 80px;text-align:center;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,var(--crema))}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);padding:6px 22px;border-radius:30px;font-size:.8rem;letter-spacing:1px;margin-bottom:25px;backdrop-filter:blur(4px)}
+.hero h1{font-size:2.6rem;font-weight:700;margin-bottom:15px;text-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.hero h2{font-size:1.2rem;font-weight:300;opacity:.9;margin-bottom:30px;max-width:700px;margin-left:auto;margin-right:auto}
+.hero-meta{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;font-size:.85rem;opacity:.8}
+.hero-meta span{background:rgba(255,255,255,0.1);padding:6px 16px;border-radius:20px}
+/* CONTENT */
+.content{max-width:1100px;margin:0 auto;padding:40px 40px 80px}
+.section{margin-bottom:60px;animation:fadeUp .6s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:1.8rem;color:var(--verde);border-bottom:3px solid var(--verde-claro);padding-bottom:12px;margin-bottom:30px;position:relative}
+.section-title::after{content:'';position:absolute;bottom:-3px;left:0;width:80px;height:3px;background:var(--azul)}
+.subsection-title{font-size:1.35rem;color:var(--marron);margin:35px 0 18px;padding-left:15px;border-left:4px solid var(--verde-claro)}
+/* CARDS */
+.card{background:#fff;border-radius:14px;padding:30px;margin-bottom:25px;box-shadow:var(--sombra);border:1px solid rgba(45,80,22,0.08);transition:box-shadow .3s}
+.card:hover{box-shadow:var(--sombra-hover)}
+.card p{margin-bottom:12px}
+/* ARCHITECTURE */
+.arch-diagram{background:linear-gradient(135deg,#fff,var(--beige));border:2px solid var(--beige-oscuro);border-radius:14px;padding:40px 20px;text-align:center;margin:25px 0;overflow-x:auto}
+.arch-flow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;min-width:700px;margin:0 auto}
+.arch-box{background:#fff;border:2px solid var(--verde-claro);border-radius:12px;padding:18px 22px;min-width:140px;text-align:center;box-shadow:0 3px 10px rgba(45,80,22,0.1);position:relative}
+.arch-box h4{font-size:.85rem;margin-bottom:4px;color:var(--verde)}
+.arch-box p{font-size:.72rem;color:#777;margin:0}
+.arch-box.highlight{background:var(--verde);color:#fff;border-color:var(--verde)}
+.arch-box.highlight h4{color:#fff}
+.arch-box.highlight p{color:rgba(255,255,255,0.7)}
+.arch-arrow{font-size:1.6rem;color:var(--verde-claro);padding:0 8px;font-weight:700;flex-shrink:0}
+/* TABLES */
+.table-wrap{overflow-x:auto;margin:20px 0;border-radius:12px;box-shadow:var(--sombra)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+thead{background:var(--verde);color:#fff}
+th{padding:14px 18px;text-align:left;font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px}
+td{padding:12px 18px;border-bottom:1px solid #eee}
+tbody tr:hover{background:rgba(45,80,22,0.04)}
+tbody tr:nth-child(even){background:rgba(245,240,225,0.4)}
+/* BADGES */
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'Fira Code',monospace}
+.badge-post{background:#dcfce7;color:#166534}
+.badge-get{background:#dbeafe;color:#1e40af}
+.badge-put{background:#ffedd5;color:#9a3412}
+.badge-delete{background:#fee2e2;color:#991b1b}
+.badge-jwt{background:#fef3c7;color:#92400e;font-size:.7rem}
+.badge-no{background:#f1f5f9;color:#64748b;font-size:.7rem}
+.badge-admin{background:#ede9fe;color:#5b21b6;font-size:.7rem}
+.badge-si{background:#dcfce7;color:#166534;padding:2px 10px;font-size:.78rem}
+.badge-no-perm{background:#fee2e2;color:#991b1b;padding:2px 10px;font-size:.78rem}
+/* ENDPOINT CARD */
+.endpoint-card{background:#fff;border-radius:14px;margin-bottom:30px;overflow:hidden;box-shadow:var(--sombra);border:1px solid rgba(45,80,22,0.08)}
+.endpoint-header{display:flex;align-items:center;gap:14px;padding:18px 24px;background:linear-gradient(135deg,var(--beige),#fff);border-bottom:1px solid var(--beige-oscuro);cursor:pointer}
+.endpoint-header h4{font-size:1rem;color:var(--texto);font-family:'Source Sans Pro',sans-serif;flex:1}
+.endpoint-path{font-family:'Fira Code',monospace;font-size:.88rem;color:var(--marron);font-weight:600}
+.endpoint-body{padding:0}
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--beige-oscuro);background:var(--beige)}
+.tab{padding:10px 24px;cursor:pointer;font-size:.85rem;font-weight:600;border:none;background:none;color:#888;transition:all .2s;position:relative}
+.tab.active{color:var(--verde)}
+.tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--verde)}
+.tab-content{display:none;padding:20px 24px}
+.tab-content.active{display:block}
+/* CODE */
+.code-block{position:relative;background:#1e293b;border-radius:10px;padding:20px;margin:12px 0;overflow-x:auto;font-family:'Fira Code',monospace;font-size:.82rem;line-height:1.8;color:#e2e8f0}
+.code-block .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#94a3b8;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.72rem;font-family:'Source Sans Pro',sans-serif;transition:all .2s}
+.code-block .copy-btn:hover{background:rgba(255,255,255,0.2);color:#fff}
+.code-block .copy-btn.copied{background:var(--verde-claro);color:#fff;border-color:var(--verde-claro)}
+.json-key{color:#7dd3fc}
+.json-string{color:#86efac}
+.json-number{color:#fbbf24}
+.json-bool{color:#c084fc}
+.json-null{color:#f87171}
+/* POSTMAN CARD */
+.postman-card{background:#fff;border-radius:14px;margin-bottom:25px;overflow:hidden;box-shadow:var(--sombra);border:1px solid rgba(45,80,22,0.08)}
+.postman-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.postman-bar .method{font-family:'Fira Code',monospace;font-weight:700;font-size:.82rem;padding:4px 14px;border-radius:6px;min-width:55px;text-align:center}
+.postman-bar .method.post-m{background:#dcfce7;color:#166534}
+.postman-bar .method.get-m{background:#dbeafe;color:#1e40af}
+.postman-bar .method.put-m{background:#ffedd5;color:#9a3412}
+.postman-bar .url{font-family:'Fira Code',monospace;font-size:.82rem;color:var(--texto);flex:1;word-break:break-all}
+.postman-bar .status{font-family:'Fira Code',monospace;font-size:.82rem;font-weight:700;padding:4px 14px;border-radius:6px}
+.postman-bar .status.s2xx{background:#dcfce7;color:#166534}
+.postman-bar .status.s4xx{background:#fee2e2;color:#991b1b}
+.postman-body{padding:20px}
+.postman-body h5{font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:'Source Sans Pro',sans-serif}
+.postman-desc{font-size:.88rem;color:var(--texto);margin-bottom:15px;padding:10px 16px;background:var(--beige);border-radius:8px;border-left:3px solid var(--verde-claro)}
+/* ER DIAGRAM */
+.er-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;margin:25px 0}
+.er-table{background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--sombra);border:1px solid rgba(45,80,22,0.1)}
+.er-table-header{background:var(--verde);color:#fff;padding:14px 18px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600}
+.er-table-body{padding:0}
+.er-row{display:flex;justify-content:space-between;padding:8px 18px;border-bottom:1px solid #f0f0f0;font-size:.82rem;font-family:'Fira Code',monospace}
+.er-row:last-child{border-bottom:none}
+.er-row .col-name{color:var(--texto)}
+.er-row .col-type{color:#888;font-size:.76rem}
+.er-row.pk{background:#fef3c7}
+.er-row.fk{background:#ede9fe}
+.er-badge{font-size:.62rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:6px}
+.er-badge.pk-badge{background:#f59e0b;color:#fff}
+.er-badge.fk-badge{background:#8b5cf6;color:#fff}
+.er-badge.uq-badge{background:#3b82f6;color:#fff}
+.er-badge.nn-badge{background:#ef4444;color:#fff}
+/* PERMISSIONS TABLE */
+.perm-table td,.perm-table th{text-align:center}
+.perm-table td:first-child,.perm-table th:first-child{text-align:left}
+/* RESPONSIVE */
+@media(max-width:900px){
+.sidebar{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-toggle{display:block}
+.main{margin-left:0}
+.hero{padding:80px 25px 60px}
+.hero h1{font-size:1.8rem}
+.content{padding:25px 18px 60px}
+.arch-diagram{padding:25px 10px}
+}
+/* SCROLL TOP */
+.scroll-top{position:fixed;bottom:30px;right:30px;background:var(--verde);color:#fff;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(45,80,22,0.3);opacity:0;transition:all .3s;z-index:999;border:none;font-size:1.2rem}
+.scroll-top.visible{opacity:1}
+.scroll-top:hover{background:var(--verde-claro);transform:translateY(-3px)}
+/* INFO BOX */
+.info-box{background:linear-gradient(135deg,#f0fdf4,#fff);border:1px solid #bbf7d0;border-left:4px solid var(--verde-claro);border-radius:10px;padding:18px 22px;margin:18px 0;font-size:.9rem}
+.info-box.warn{background:linear-gradient(135deg,#fefce8,#fff);border-color:#fde68a;border-left-color:#f59e0b}
+.info-box strong{color:var(--verde)}
+/* DECORATIVE LEAF */
+.leaf-decoration{position:absolute;opacity:.06;pointer-events:none}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Toggle -->
+<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>LuluncotoApp</h3>
+<p>MiBarrio - API Docs</p>
+</div>
+<div class="sidebar-nav">
+<div class="nav-section">General</div>
+<a href="#hero" onclick="closeSidebar()">Inicio</a>
+<a href="#integracion" onclick="closeSidebar()">3.2 Integracion de APIs</a>
+<div class="nav-section">Implementacion</div>
+<a href="#autenticacion" onclick="closeSidebar()">Autenticacion</a>
+<a href="#usuario" onclick="closeSidebar()">Usuario</a>
+<a href="#categorias" onclick="closeSidebar()">Categorias</a>
+<a href="#reportes" onclick="closeSidebar()">Reportes</a>
+<a href="#estadisticas" onclick="closeSidebar()">Estadisticas</a>
+<a href="#historial" onclick="closeSidebar()">Historial</a>
+<a href="#errores" onclick="closeSidebar()">Manejo de Errores</a>
+<a href="#permisos" onclick="closeSidebar()">Permisos por Rol</a>
+<div class="nav-section">Pruebas</div>
+<a href="#pruebas" onclick="closeSidebar()">3.4 Pruebas Postman</a>
+<div class="nav-section">Modelo</div>
+<a href="#modelo" onclick="closeSidebar()">Modelo de Datos</a>
+</div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<!-- Hero -->
+<header class="hero" id="hero">
+<div class="hero-badge">Documentacion Tecnica v2.0</div>
+<h1>API Backend LuluncotoApp (MiBarrio)</h1>
+<h2>Plataforma de Participacion Ciudadana - Reporte de Problemas Urbanos</h2>
+<div class="hero-meta">
+<span>Pontificia Universidad Catolica del Ecuador</span>
+<span>Proyecto Integrador</span>
+<span>Febrero 2026</span>
+</div>
+</header>
+
+<div class="content">
+
+<!-- ============================================================ -->
+<!-- SECCION 3.2 - INTEGRACION DE APIS -->
+<!-- ============================================================ -->
+<section class="section" id="integracion">
+<h2 class="section-title">3.2 Integracion de APIs</h2>
+
+<div class="card">
+<h3 class="subsection-title">Frontend Android (Retrofit)</h3>
+<p>La aplicacion movil Android nativa consume la API REST a traves de <strong>Retrofit2</strong>, una libreria HTTP type-safe para Android y Java. La comunicacion se realiza mediante peticiones HTTP estandar (GET, POST, PUT) con cuerpos en formato JSON.</p>
+<p>La configuracion CORS del backend esta abierta (origin: <code>*</code>) para permitir conexiones desde cualquier cliente movil sin restricciones de dominio. La autenticacion es completamente <strong>stateless</strong> mediante tokens JWT enviados en el header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+</div>
+
+<div class="card">
+<h3 class="subsection-title">Base de Datos MySQL (Railway)</h3>
+<p>El backend se conecta a una instancia de <strong>MySQL 9.4</strong> desplegada en la nube de Railway mediante JDBC. Hibernate ORM gestiona el mapeo objeto-relacional con la estrategia <code>ddl-auto=update</code>, permitiendo la migracion automatica del esquema cuando se agregan nuevas entidades o campos.</p>
+<p>Los datos iniciales (roles USUARIO y ADMIN) se insertan mediante un archivo <code>data.sql</code> con sentencias <code>INSERT IGNORE</code>, garantizando la idempotencia en cada despliegue.</p>
+<div class="info-box warn">
+<strong>Nota:</strong> MySQL en Railway es case-sensitive para nombres de tablas. Todas las tablas estan definidas en minuscula para evitar errores de referencia.
+</div>
+</div>
+
+<div class="card">
+<h3 class="subsection-title">Docker</h3>
+<p>El proyecto utiliza un <strong>Dockerfile multi-stage</strong> para optimizar el tamano de la imagen final. La primera etapa compila el proyecto con Maven 3.9 y Java 17. La segunda etapa empaqueta unicamente el JAR resultante sobre una imagen JRE 17 ligera, reduciendo significativamente el peso del contenedor desplegado en Railway.</p>
+</div>
+
+<div class="card">
+<h3 class="subsection-title">Diagrama de Arquitectura</h3>
+<div class="arch-diagram">
+<div class="arch-flow">
+<div class="arch-box">
+<h4>Android App</h4>
+<p>Kotlin / XML</p>
+</div>
+<div class="arch-arrow">&#10132;</div>
+<div class="arch-box">
+<h4>Retrofit2</h4>
+<p>HTTP Client</p>
+</div>
+<div class="arch-arrow">&#10132;</div>
+<div class="arch-box highlight">
+<h4>Spring Boot API</h4>
+<p>REST + JWT + JPA</p>
+</div>
+<div class="arch-arrow">&#10132;</div>
+<div class="arch-box">
+<h4>Hibernate ORM</h4>
+<p>JPA / JDBC</p>
+</div>
+<div class="arch-arrow">&#10132;</div>
+<div class="arch-box">
+<h4>MySQL 9.4</h4>
+<p>Railway Cloud</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECCION 3.3 - IMPLEMENTACION Y FUNCIONAMIENTO -->
+<!-- ============================================================ -->
+<section class="section" id="implementacion">
+<h2 class="section-title">3.3 Implementacion y Funcionamiento de APIs</h2>
+
+<!-- MODULO AUTENTICACION -->
+<div id="autenticacion">
+<h3 class="subsection-title">Modulo de Autenticacion</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-post">POST</span></td><td><code>/luluncoto/auth/registro</code></td><td>Registrar nuevo ciudadano</td><td><span class="badge badge-no">No</span></td></tr>
+<tr><td><span class="badge badge-post">POST</span></td><td><code>/luluncoto/auth/login</code></td><td>Iniciar sesion, retorna JWT</td><td><span class="badge badge-no">No</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Registro -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-post">POST</span>
+<h4>Registro de Ciudadano</h4>
+<span class="endpoint-path">/luluncoto/auth/registro</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'reg-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'reg-res')">Response 201</button>
+</div>
+<div class="tab-content active" id="reg-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json</div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Perez"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"mipassword10"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1712345678"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0987654321"</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"2000-01-15"</span>
+}</div>
+</div>
+<div class="tab-content" id="reg-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Perez"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1712345678"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0987654321"</span>,
+  <span class="json-key">"fechadeNacimiento"</span>: <span class="json-string">"2000-01-15"</span>,
+  <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T12:00:00"</span>
+}</div>
+</div>
+</div>
+</div>
+
+<!-- Login -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-post">POST</span>
+<h4>Inicio de Sesion</h4>
+<span class="endpoint-path">/luluncoto/auth/login</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'login-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'login-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="login-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json</div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"mipassword10"</span>
+}</div>
+</div>
+<div class="tab-content" id="login-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"token"</span>: <span class="json-string">"eyJhbGciOiJIUzI1NiJ9..."</span>,
+  <span class="json-key">"user"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Perez"</span>,
+    <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+    <span class="json-key">"cedula"</span>: <span class="json-string">"1712345678"</span>,
+    <span class="json-key">"celular"</span>: <span class="json-string">"0987654321"</span>,
+    <span class="json-key">"fotoPerfil"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"2000-01-15"</span>,
+    <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+    <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T12:00:00"</span>
+  }
+}</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODULO USUARIO -->
+<div id="usuario">
+<h3 class="subsection-title">Modulo de Usuario</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/usuario/perfil</code></td><td>Obtener perfil del usuario autenticado</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+<tr><td><span class="badge badge-put">PUT</span></td><td><code>/luluncoto/usuario/perfil</code></td><td>Actualizar nombre, celular, foto</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+<tr><td><span class="badge badge-put">PUT</span></td><td><code>/luluncoto/usuario/cambiar-contrasena</code></td><td>Cambiar contrasena</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Obtener perfil -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-get">GET</span>
+<h4>Obtener Perfil</h4>
+<span class="endpoint-path">/luluncoto/usuario/perfil</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'perfil-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'perfil-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="perfil-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<p style="font-size:.85rem;color:#888;margin-top:10px">No requiere body. El usuario se identifica mediante el token JWT.</p>
+</div>
+<div class="tab-content" id="perfil-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Perez"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1712345678"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0987654321"</span>,
+  <span class="json-key">"fotoPerfil"</span>: <span class="json-null">null</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"2000-01-15"</span>,
+  <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T12:00:00"</span>
+}</div>
+</div>
+</div>
+</div>
+
+<!-- Actualizar perfil -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-put">PUT</span>
+<h4>Actualizar Perfil</h4>
+<span class="endpoint-path">/luluncoto/usuario/perfil</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'actperfil-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'actperfil-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="actperfil-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Carlos Perez"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fotoPerfil"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>
+}</div>
+</div>
+<div class="tab-content" id="actperfil-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Juan Carlos Perez"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"juan@ejemplo.com"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1712345678"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fotoPerfil"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"2000-01-15"</span>,
+  <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T12:00:00"</span>
+}</div>
+</div>
+</div>
+</div>
+
+<!-- Cambiar contrasena -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-put">PUT</span>
+<h4>Cambiar Contrasena</h4>
+<span class="endpoint-path">/luluncoto/usuario/cambiar-contrasena</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'cambio-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'cambio-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="cambio-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"contrasenaActual"</span>: <span class="json-string">"mipassword10"</span>,
+  <span class="json-key">"contrasenaNueva"</span>: <span class="json-string">"nuevapassword12"</span>
+}</div>
+</div>
+<div class="tab-content" id="cambio-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Contrasena actualizada correctamente"</span>
+}</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODULO CATEGORIAS -->
+<div id="categorias">
+<h3 class="subsection-title">Modulo de Categorias</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/categorias</code></td><td>Listar todas las categorias</td><td><span class="badge badge-no">No</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-get">GET</span>
+<h4>Listar Categorias</h4>
+<span class="endpoint-path">/luluncoto/categorias</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'cat-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'cat-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="cat-req">
+<p style="font-size:.85rem;color:#888;margin-top:10px">No requiere headers de autenticacion ni body. Endpoint publico.</p>
+</div>
+<div class="tab-content" id="cat-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>[
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"nombre"</span>: <span class="json-string">"BACHES"</span>,
+    <span class="json-key">"descripcion"</span>: <span class="json-string">"Huecos o danos en la via publica"</span>,
+    <span class="json-key">"esPredefinida"</span>: <span class="json-bool">true</span>
+  },
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">7</span>,
+    <span class="json-key">"nombre"</span>: <span class="json-string">"ALERTA_AMBER"</span>,
+    <span class="json-key">"descripcion"</span>: <span class="json-string">"Alerta de persona desaparecida"</span>,
+    <span class="json-key">"esPredefinida"</span>: <span class="json-bool">false</span>
+  },
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">8</span>,
+    <span class="json-key">"nombre"</span>: <span class="json-string">"OTRO"</span>,
+    <span class="json-key">"descripcion"</span>: <span class="json-string">"Otro tipo de reporte creado por el ciudadano"</span>,
+    <span class="json-key">"esPredefinida"</span>: <span class="json-bool">false</span>
+  }
+]</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODULO REPORTES -->
+<div id="reportes">
+<h3 class="subsection-title">Modulo de Reportes</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th><th>Rol</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-post">POST</span></td><td><code>/luluncoto/reportes</code></td><td>Crear nuevo reporte</td><td><span class="badge badge-jwt">JWT</span></td><td>USUARIO</td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/reportes</code></td><td>Listar todos los reportes</td><td><span class="badge badge-jwt">JWT</span></td><td>Todos</td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/reportes/{id}</code></td><td>Ver detalle de un reporte</td><td><span class="badge badge-jwt">JWT</span></td><td>Todos</td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/reportes/mis-reportes</code></td><td>Historial del usuario</td><td><span class="badge badge-jwt">JWT</span></td><td>Todos</td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/reportes/por-estado?estado=X</code></td><td>Filtrar por estado</td><td><span class="badge badge-jwt">JWT</span></td><td>Todos</td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/reportes/por-categoria/{id}</code></td><td>Filtrar por categoria</td><td><span class="badge badge-jwt">JWT</span></td><td>Todos</td></tr>
+<tr><td><span class="badge badge-put">PUT</span></td><td><code>/luluncoto/reportes/{id}/estado</code></td><td>Cambiar estado</td><td><span class="badge badge-jwt">JWT</span></td><td>ADMIN</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Crear reporte -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-post">POST</span>
+<h4>Crear Reporte</h4>
+<span class="endpoint-path">/luluncoto/reportes</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'crear-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'crear-res')">Response 201</button>
+</div>
+<div class="tab-content active" id="crear-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Bache peligroso en Av. Principal"</span>,
+  <span class="json-key">"descripcion"</span>: <span class="json-string">"Hueco grande que puede causar accidentes"</span>,
+  <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>,
+  <span class="json-key">"latitud"</span>: <span class="json-number">-0.1807</span>,
+  <span class="json-key">"longitud"</span>: <span class="json-number">-78.4678</span>,
+  <span class="json-key">"categoriaId"</span>: <span class="json-number">1</span>
+}</div>
+</div>
+<div class="tab-content" id="crear-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Bache peligroso en Av. Principal"</span>,
+  <span class="json-key">"descripcion"</span>: <span class="json-string">"Hueco grande que puede causar accidentes"</span>,
+  <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>,
+  <span class="json-key">"latitud"</span>: <span class="json-number">-0.1807</span>,
+  <span class="json-key">"longitud"</span>: <span class="json-number">-78.4678</span>,
+  <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>,
+  <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"BACHES"</span>,
+  <span class="json-key">"categoriaId"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Juan Perez"</span>,
+  <span class="json-key">"usuarioId"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>,
+  <span class="json-key">"actualizadoEn"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>
+}</div>
+</div>
+</div>
+</div>
+
+<!-- Listar reportes -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-get">GET</span>
+<h4>Listar Todos los Reportes</h4>
+<span class="endpoint-path">/luluncoto/reportes</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'listar-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'listar-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="listar-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+</div>
+<div class="tab-content" id="listar-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>[
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"titulo"</span>: <span class="json-string">"Bache peligroso en Av. Principal"</span>,
+    <span class="json-key">"descripcion"</span>: <span class="json-string">"Hueco grande..."</span>,
+    <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>,
+    <span class="json-key">"latitud"</span>: <span class="json-number">-0.1807</span>,
+    <span class="json-key">"longitud"</span>: <span class="json-number">-78.4678</span>,
+    <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>,
+    <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"BACHES"</span>,
+    <span class="json-key">"categoriaId"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Juan Perez"</span>,
+    <span class="json-key">"usuarioId"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>,
+    <span class="json-key">"actualizadoEn"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>
+  }
+]</div>
+</div>
+</div>
+</div>
+
+<!-- Cambiar estado -->
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-put">PUT</span>
+<h4>Cambiar Estado de Reporte (Solo ADMIN)</h4>
+<span class="endpoint-path">/luluncoto/reportes/{id}/estado</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'estado-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'estado-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="estado-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(token de ADMIN)</span></div>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span>
+}</div>
+<div class="info-box">
+<strong>Estados validos:</strong> PENDIENTE, EN_PROCESO, RESUELTO, RECHAZADO
+</div>
+</div>
+<div class="tab-content" id="estado-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Bache peligroso en Av. Principal"</span>,
+  <span class="json-key">"descripcion"</span>: <span class="json-string">"Hueco grande que puede causar accidentes"</span>,
+  <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/foto.jpg"</span>,
+  <span class="json-key">"latitud"</span>: <span class="json-number">-0.1807</span>,
+  <span class="json-key">"longitud"</span>: <span class="json-number">-78.4678</span>,
+  <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span>,
+  <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"BACHES"</span>,
+  <span class="json-key">"categoriaId"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Juan Perez"</span>,
+  <span class="json-key">"usuarioId"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>,
+  <span class="json-key">"actualizadoEn"</span>: <span class="json-string">"2026-02-09T14:30:00"</span>
+}</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODULO ESTADISTICAS -->
+<div id="estadisticas">
+<h3 class="subsection-title">Modulo de Estadisticas (Solo ADMIN)</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th><th>Rol</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/estadisticas</code></td><td>Dashboard de estadisticas</td><td><span class="badge badge-jwt">JWT</span></td><td><span class="badge badge-admin">ADMIN</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-get">GET</span>
+<h4>Resumen de Estadisticas</h4>
+<span class="endpoint-path">/luluncoto/estadisticas</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'stats-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'stats-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="stats-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(token de ADMIN)</span></div>
+</div>
+<div class="tab-content" id="stats-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"totalReportes"</span>: <span class="json-number">15</span>,
+  <span class="json-key">"reportesPorCategoria"</span>: [
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"BACHES"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">5</span> },
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"BASURA"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">4</span> },
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"ALUMBRADO"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">3</span> },
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"ACERAS"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">3</span> }
+  ],
+  <span class="json-key">"reportesPorEstado"</span>: [
+    { <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">8</span> },
+    { <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">4</span> },
+    { <span class="json-key">"estado"</span>: <span class="json-string">"RESUELTO"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">3</span> }
+  ]
+}</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODULO HISTORIAL -->
+<div id="historial">
+<h3 class="subsection-title">Modulo de Historial</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Metodo</th><th>Endpoint</th><th>Descripcion</th><th>Auth</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/historial</code></td><td>Todo el historial</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/historial/usuario/{id}</code></td><td>Historial por usuario</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+<tr><td><span class="badge badge-get">GET</span></td><td><code>/luluncoto/historial/entidad?entidad=X&entidadId=Y</code></td><td>Historial por entidad</td><td><span class="badge badge-jwt">JWT</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="endpoint-card">
+<div class="endpoint-header" onclick="toggleEndpoint(this)">
+<span class="badge badge-get">GET</span>
+<h4>Obtener Historial Completo</h4>
+<span class="endpoint-path">/luluncoto/historial</span>
+</div>
+<div class="endpoint-body">
+<div class="tabs">
+<button class="tab active" onclick="switchTab(event,'hist-req')">Request</button>
+<button class="tab" onclick="switchTab(event,'hist-res')">Response 200</button>
+</div>
+<div class="tab-content active" id="hist-req">
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+</div>
+<div class="tab-content" id="hist-res">
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>[
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Juan Perez"</span>,
+    <span class="json-key">"usuarioId"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"accion"</span>: <span class="json-string">"CREAR_REPORTE"</span>,
+    <span class="json-key">"entidad"</span>: <span class="json-string">"REPORTE"</span>,
+    <span class="json-key">"entidadId"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"detalle"</span>: <span class="json-string">"Reporte creado: Bache peligroso - Categoria: BACHES"</span>,
+    <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>
+  }
+]</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MANEJO DE ERRORES -->
+<div id="errores">
+<h3 class="subsection-title">Manejo de Errores</h3>
+<div class="card">
+<p>Todos los errores del backend siguen un formato estandarizado gestionado por el <code>@ControllerAdvice</code> (<code>ManejadorGlobalExcepciones</code>). Cada respuesta de error incluye el codigo HTTP, un mensaje descriptivo y la marca de tiempo.</p>
+<h5 style="font-size:.82rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px">Formato de error estandar</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">404</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Usuario no encontrado"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T13:00:00"</span>
+}</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Codigo</th><th>Excepcion</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><span class="badge badge-put" style="background:#fef3c7;color:#92400e">401</span></td><td><code>ContrasenaIncorrectaException</code></td><td>Contrasena incorrecta en el login</td></tr>
+<tr><td><span class="badge badge-put" style="background:#fee2e2;color:#991b1b">403</span></td><td><code>AccesoDenegadoException</code></td><td>Sin permisos para esta accion (ej. usuario intenta cambiar estado)</td></tr>
+<tr><td><span class="badge badge-put" style="background:#dbeafe;color:#1e40af">404</span></td><td><code>UsuarioNoEncontradoException</code></td><td>El usuario no existe en la base de datos</td></tr>
+<tr><td><span class="badge badge-put" style="background:#dbeafe;color:#1e40af">404</span></td><td><code>RecursoNoEncontradoException</code></td><td>Reporte, categoria u otro recurso no encontrado</td></tr>
+<tr><td><span class="badge badge-put" style="background:#ede9fe;color:#5b21b6">409</span></td><td><code>RegistroDuplicadoException</code></td><td>Email o cedula ya registrados</td></tr>
+<tr><td><span class="badge badge-delete">500</span></td><td><code>Exception</code></td><td>Error interno del servidor</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- PERMISOS POR ROL -->
+<div id="permisos">
+<h3 class="subsection-title">Permisos por Rol</h3>
+<div class="table-wrap">
+<table class="perm-table">
+<thead><tr><th>Accion</th><th>USUARIO (Ciudadano)</th><th>ADMIN (Municipio)</th></tr></thead>
+<tbody>
+<tr><td>Registrarse / Login</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Ver perfil propio</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Actualizar perfil propio</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Crear reportes</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-no-perm">No</span></td></tr>
+<tr><td>Ver reportes</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Ver mis reportes</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Cambiar estado de reporte</td><td><span class="badge badge-no-perm">No</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Ver estadisticas</td><td><span class="badge badge-no-perm">No</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Ver historial</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+<tr><td>Ver categorias</td><td><span class="badge badge-si">Si</span></td><td><span class="badge badge-si">Si</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- SECCION 3.4 - PRUEBAS POSTMAN -->
+<!-- ============================================================ -->
+<section class="section" id="pruebas">
+<h2 class="section-title">3.4 Documentacion de Pruebas Postman</h2>
+<p style="margin-bottom:25px">A continuacion se presentan las pruebas realizadas con Postman para verificar el correcto funcionamiento de cada endpoint, incluyendo casos exitosos y de error.</p>
+
+<!-- Prueba 1: Registro exitoso -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/auth/registro</span>
+<span class="status s2xx">201 Created</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 1:</strong> Registro exitoso de un nuevo ciudadano. Se envia informacion completa y valida.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json</div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"password1234"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1798765432"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"1998-05-20"</span>
+}</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1798765432"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fechadeNacimiento"</span>: <span class="json-string">"1998-05-20"</span>,
+  <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T10:30:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 2: Registro duplicado -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/auth/registro</span>
+<span class="status s4xx">409 Conflict</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 2:</strong> Registro con email ya existente. El sistema rechaza la solicitud con codigo 409.</div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"password1234"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1798765432"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"1998-05-20"</span>
+}</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">409</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"El email ya esta registrado"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:31:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 3: Login exitoso -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/auth/login</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 3:</strong> Login exitoso con credenciales correctas. El servidor retorna token JWT y datos del usuario.</div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"password1234"</span>
+}</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"token"</span>: <span class="json-string">"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJpYUBlamVtcGxvLmNvbSIsImlhdCI6..."</span>,
+  <span class="json-key">"user"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"nombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+    <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+    <span class="json-key">"cedula"</span>: <span class="json-string">"1798765432"</span>,
+    <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+    <span class="json-key">"fotoPerfil"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"1998-05-20"</span>,
+    <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+    <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T10:30:00"</span>
+  }
+}</div>
+</div>
+</div>
+
+<!-- Prueba 4: Login contrasena incorrecta -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/auth/login</span>
+<span class="status s4xx">401 Unauthorized</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 4:</strong> Login con contrasena incorrecta. El sistema rechaza la autenticacion.</div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"contrasena"</span>: <span class="json-string">"claveErronea"</span>
+}</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">401</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Contrasena incorrecta"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:32:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 5: Obtener perfil con token -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/usuario/perfil</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 5:</strong> Obtener perfil enviando un token JWT valido en el header Authorization.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"nombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"maria@ejemplo.com"</span>,
+  <span class="json-key">"cedula"</span>: <span class="json-string">"1798765432"</span>,
+  <span class="json-key">"celular"</span>: <span class="json-string">"0991234567"</span>,
+  <span class="json-key">"fotoPerfil"</span>: <span class="json-null">null</span>,
+  <span class="json-key">"fechaDeNacimiento"</span>: <span class="json-string">"1998-05-20"</span>,
+  <span class="json-key">"rol"</span>: <span class="json-string">"USUARIO"</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T10:30:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 6: Perfil sin token -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/usuario/perfil</span>
+<span class="status s4xx">403 Forbidden</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 6:</strong> Intentar obtener perfil sin enviar token JWT. El filtro de seguridad bloquea el acceso.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span style="color:#94a3b8">// Sin header Authorization</span></div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">403</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Acceso denegado"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:33:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 7: Crear reporte -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/reportes</span>
+<span class="status s2xx">201 Created</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 7:</strong> Crear reporte exitoso como usuario USUARIO con token valido.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(USUARIO)</span></div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Luminaria danada en calle 5"</span>,
+  <span class="json-key">"descripcion"</span>: <span class="json-string">"La luz del poste no funciona desde hace una semana"</span>,
+  <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/luminaria.jpg"</span>,
+  <span class="json-key">"latitud"</span>: <span class="json-number">-0.1812</span>,
+  <span class="json-key">"longitud"</span>: <span class="json-number">-78.4690</span>,
+  <span class="json-key">"categoriaId"</span>: <span class="json-number">3</span>
+}</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Luminaria danada en calle 5"</span>,
+  <span class="json-key">"descripcion"</span>: <span class="json-string">"La luz del poste no funciona desde hace una semana"</span>,
+  <span class="json-key">"fotoUrl"</span>: <span class="json-string">"https://ejemplo.com/luminaria.jpg"</span>,
+  <span class="json-key">"latitud"</span>: <span class="json-number">-0.1812</span>,
+  <span class="json-key">"longitud"</span>: <span class="json-number">-78.4690</span>,
+  <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>,
+  <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"ALUMBRADO"</span>,
+  <span class="json-key">"categoriaId"</span>: <span class="json-number">3</span>,
+  <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+  <span class="json-key">"usuarioId"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T10:35:00"</span>,
+  <span class="json-key">"actualizadoEn"</span>: <span class="json-string">"2026-02-09T10:35:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 8: Crear reporte como ADMIN -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method post-m">POST</span>
+<span class="url">{{base_url}}/luluncoto/reportes</span>
+<span class="status s4xx">403 Forbidden</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 8:</strong> Intentar crear un reporte con token de ADMIN. Solo los ciudadanos (USUARIO) pueden crear reportes.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(ADMIN)</span></div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">403</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Solo los ciudadanos pueden crear reportes"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:36:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 9: Mis reportes -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/reportes/mis-reportes</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 9:</strong> Obtener el historial de reportes creados por el usuario autenticado.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(USUARIO)</span></div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>[
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"titulo"</span>: <span class="json-string">"Luminaria danada en calle 5"</span>,
+    <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>,
+    <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"ALUMBRADO"</span>,
+    <span class="json-key">"creadoEn"</span>: <span class="json-string">"2026-02-09T10:35:00"</span>,
+    <span style="color:#94a3b8">// ... demas campos</span>
+  }
+]</div>
+</div>
+</div>
+
+<!-- Prueba 10: Cambiar estado como USUARIO -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method put-m">PUT</span>
+<span class="url">{{base_url}}/luluncoto/reportes/2/estado</span>
+<span class="status s4xx">403 Forbidden</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 10:</strong> Intentar cambiar estado con token de USUARIO. Solo ADMIN puede cambiar estados de reportes.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(USUARIO)</span></div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{ <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span> }</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">403</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Solo los administradores pueden cambiar el estado"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:37:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 11: Cambiar estado como ADMIN -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method put-m">PUT</span>
+<span class="url">{{base_url}}/luluncoto/reportes/2/estado</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 11:</strong> Cambiar estado de reporte exitosamente como administrador.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(ADMIN)</span></div>
+<h5>Body</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{ <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span> }</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"titulo"</span>: <span class="json-string">"Luminaria danada en calle 5"</span>,
+  <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span>,
+  <span class="json-key">"categoriaNombre"</span>: <span class="json-string">"ALUMBRADO"</span>,
+  <span class="json-key">"actualizadoEn"</span>: <span class="json-string">"2026-02-09T10:38:00"</span>,
+  <span style="color:#94a3b8">// ... demas campos</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 12: Estadisticas como ADMIN -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/estadisticas</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 12:</strong> Obtener dashboard de estadisticas como administrador.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(ADMIN)</span></div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"totalReportes"</span>: <span class="json-number">15</span>,
+  <span class="json-key">"reportesPorCategoria"</span>: [
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"BACHES"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">5</span> },
+    { <span class="json-key">"categoria"</span>: <span class="json-string">"BASURA"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">4</span> }
+  ],
+  <span class="json-key">"reportesPorEstado"</span>: [
+    { <span class="json-key">"estado"</span>: <span class="json-string">"PENDIENTE"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">8</span> },
+    { <span class="json-key">"estado"</span>: <span class="json-string">"EN_PROCESO"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">4</span> },
+    { <span class="json-key">"estado"</span>: <span class="json-string">"RESUELTO"</span>, <span class="json-key">"cantidad"</span>: <span class="json-number">3</span> }
+  ]
+}</div>
+</div>
+</div>
+
+<!-- Prueba 13: Estadisticas como USUARIO -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/estadisticas</span>
+<span class="status s4xx">403 Forbidden</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 13:</strong> Intentar acceder a estadisticas como USUARIO. Acceso denegado.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9... <span style="color:#94a3b8">(USUARIO)</span></div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>{
+  <span class="json-key">"codigoEstado"</span>: <span class="json-number">403</span>,
+  <span class="json-key">"mensaje"</span>: <span class="json-string">"Solo los administradores pueden ver las estadisticas"</span>,
+  <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:40:00"</span>
+}</div>
+</div>
+</div>
+
+<!-- Prueba 14: Historial completo -->
+<div class="postman-card">
+<div class="postman-bar">
+<span class="method get-m">GET</span>
+<span class="url">{{base_url}}/luluncoto/historial</span>
+<span class="status s2xx">200 OK</span>
+</div>
+<div class="postman-body">
+<div class="postman-desc"><strong>Prueba 14:</strong> Obtener historial completo de actividad del sistema.</div>
+<h5>Headers</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiJ9...</div>
+<h5>Response</h5>
+<div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>[
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Maria Garcia"</span>,
+    <span class="json-key">"usuarioId"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"accion"</span>: <span class="json-string">"CREAR_REPORTE"</span>,
+    <span class="json-key">"entidad"</span>: <span class="json-string">"REPORTE"</span>,
+    <span class="json-key">"entidadId"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"detalle"</span>: <span class="json-string">"Reporte creado: Luminaria danada - Categoria: ALUMBRADO"</span>,
+    <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:35:00"</span>
+  },
+  {
+    <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"usuarioNombre"</span>: <span class="json-string">"Admin Sistema"</span>,
+    <span class="json-key">"usuarioId"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"accion"</span>: <span class="json-string">"CAMBIAR_ESTADO"</span>,
+    <span class="json-key">"entidad"</span>: <span class="json-string">"REPORTE"</span>,
+    <span class="json-key">"entidadId"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"detalle"</span>: <span class="json-string">"Estado cambiado a EN_PROCESO"</span>,
+    <span class="json-key">"fechaHora"</span>: <span class="json-string">"2026-02-09T10:38:00"</span>
+  }
+]</div>
+</div>
+</div>
+
+</section>
+
+<!-- ============================================================ -->
+<!-- MODELO DE DATOS -->
+<!-- ============================================================ -->
+<section class="section" id="modelo">
+<h2 class="section-title">Modelo de Datos (Entidad-Relacion)</h2>
+<p style="margin-bottom:25px">El siguiente diagrama muestra las 5 tablas principales del sistema con sus campos, tipos de dato y relaciones. Las claves primarias estan marcadas en amarillo y las claves foraneas en violeta.</p>
+
+<div class="er-container">
+
+<!-- users -->
+<div class="er-table">
+<div class="er-table-header">users</div>
+<div class="er-table-body">
+<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
+<div class="er-row"><span class="col-name">nombre <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
+<div class="er-row"><span class="col-name">email <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(60)</span></div>
+<div class="er-row"><span class="col-name">contrasena <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(200)</span></div>
+<div class="er-row"><span class="col-name">cedula <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(10)</span></div>
+<div class="er-row"><span class="col-name">celular</span><span class="col-type">VARCHAR(10)</span></div>
+<div class="er-row"><span class="col-name">fechade_nacimiento <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATE</span></div>
+<div class="er-row"><span class="col-name">foto_perfil</span><span class="col-type">VARCHAR(500)</span></div>
+<div class="er-row fk"><span class="col-name">rol_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; roles.id</span></div>
+<div class="er-row"><span class="col-name">creado_en</span><span class="col-type">DATETIME</span></div>
+</div>
+</div>
+
+<!-- roles -->
+<div class="er-table">
+<div class="er-table-header">roles</div>
+<div class="er-table-body">
+<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
+<div class="er-row"><span class="col-name">nombre <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(20)</span></div>
+</div>
+</div>
+
+<!-- categorias_reporte -->
+<div class="er-table">
+<div class="er-table-header">categorias_reporte</div>
+<div class="er-table-body">
+<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
+<div class="er-row"><span class="col-name">nombre <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
+<div class="er-row"><span class="col-name">descripcion</span><span class="col-type">VARCHAR(200)</span></div>
+<div class="er-row"><span class="col-name">es_predefinida <span class="er-badge nn-badge">NN</span></span><span class="col-type">BOOLEAN</span></div>
+</div>
+</div>
+
+<!-- reportes -->
+<div class="er-table">
+<div class="er-table-header">reportes</div>
+<div class="er-table-body">
+<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
+<div class="er-row"><span class="col-name">titulo <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(100)</span></div>
+<div class="er-row"><span class="col-name">descripcion <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(500)</span></div>
+<div class="er-row"><span class="col-name">foto_url</span><span class="col-type">VARCHAR(500)</span></div>
+<div class="er-row"><span class="col-name">latitud <span class="er-badge nn-badge">NN</span></span><span class="col-type">DOUBLE</span></div>
+<div class="er-row"><span class="col-name">longitud <span class="er-badge nn-badge">NN</span></span><span class="col-type">DOUBLE</span></div>
+<div class="er-row"><span class="col-name">estado <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(20)</span></div>
+<div class="er-row fk"><span class="col-name">categoria_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; categorias_reporte.id</span></div>
+<div class="er-row fk"><span class="col-name">usuario_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; users.id</span></div>
+<div class="er-row"><span class="col-name">creado_en <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
+<div class="er-row"><span class="col-name">actualizado_en <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
+</div>
+</div>
+
+<!-- historial_actividad -->
+<div class="er-table">
+<div class="er-table-header">historial_actividad</div>
+<div class="er-table-body">
+<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
+<div class="er-row fk"><span class="col-name">usuario_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; users.id</span></div>
+<div class="er-row"><span class="col-name">accion <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
+<div class="er-row"><span class="col-name">entidad <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
+<div class="er-row"><span class="col-name">entidad_id</span><span class="col-type">BIGINT</span></div>
+<div class="er-row"><span class="col-name">detalle</span><span class="col-type">VARCHAR(500)</span></div>
+<div class="er-row"><span class="col-name">fecha_hora <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
+</div>
+</div>
+
+</div>
+
+<!-- ER Relations Legend -->
+<div class="card" style="margin-top:25px">
+<h4 style="margin-bottom:12px;font-size:1rem">Relaciones entre tablas</h4>
+<div style="display:flex;flex-wrap:wrap;gap:20px;font-size:.88rem">
+<div><span class="er-badge pk-badge" style="font-size:.72rem">PK</span> Clave Primaria</div>
+<div><span class="er-badge fk-badge" style="font-size:.72rem">FK</span> Clave Foranea</div>
+<div><span class="er-badge uq-badge" style="font-size:.72rem">UQ</span> Unico</div>
+<div><span class="er-badge nn-badge" style="font-size:.72rem">NN</span> Not Null</div>
+</div>
+<ul style="margin-top:15px;padding-left:20px;font-size:.88rem;line-height:2">
+<li><strong>users.rol_id</strong> &rarr; <strong>roles.id</strong> (ManyToOne: muchos usuarios pueden tener el mismo rol)</li>
+<li><strong>reportes.categoria_id</strong> &rarr; <strong>categorias_reporte.id</strong> (ManyToOne: un reporte pertenece a una categoria)</li>
+<li><strong>reportes.usuario_id</strong> &rarr; <strong>users.id</strong> (ManyToOne: un reporte pertenece a un usuario)</li>
+<li><strong>historial_actividad.usuario_id</strong> &rarr; <strong>users.id</strong> (ManyToOne: cada registro de historial tiene un usuario)</li>
+</ul>
+</div>
+
+</section>
+
+<!-- FOOTER -->
+<footer style="text-align:center;padding:40px 20px;border-top:2px solid var(--beige-oscuro);color:#888;font-size:.85rem">
+<p style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--verde);margin-bottom:8px">LuluncotoApp - MiBarrio</p>
+<p>Pontificia Universidad Catolica del Ecuador | Proyecto Integrador | Febrero 2026</p>
+<p style="margin-top:8px;font-size:.78rem;color:#aaa">Documentacion generada para el backend Spring Boot 3.5.9 + MySQL 9.4 + Docker</p>
+</footer>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Scroll to top -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">&#8593;</button>
+
+<script>
+// Sidebar toggle
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+function closeSidebar(){if(window.innerWidth<=900)document.getElementById('sidebar').classList.remove('open')}
+
+// Tab switching
+function switchTab(e,tabId){
+  var parent=e.target.closest('.endpoint-body')||e.target.closest('.postman-body');
+  if(!parent)parent=e.target.parentElement.parentElement;
+  var tabs=parent.querySelectorAll('.tab');
+  var contents=parent.querySelectorAll('.tab-content');
+  tabs.forEach(function(t){t.classList.remove('active')});
+  contents.forEach(function(c){c.classList.remove('active')});
+  e.target.classList.add('active');
+  var el=document.getElementById(tabId);
+  if(el)el.classList.add('active');
+}
+
+// Copy code to clipboard
+function copyCode(btn){
+  var block=btn.parentElement;
+  var text=block.textContent.replace('Copiar','').replace('Copiado','').trim();
+  // Remove HTML tags for clean copy
+  var temp=document.createElement('div');
+  temp.innerHTML=block.innerHTML;
+  temp.querySelectorAll('.copy-btn').forEach(function(b){b.remove()});
+  var cleanText=temp.textContent.trim();
+  navigator.clipboard.writeText(cleanText).then(function(){
+    btn.textContent='Copiado';
+    btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copiar';btn.classList.remove('copied')},2000);
+  });
+}
+
+// Scroll top button visibility
+window.addEventListener('scroll',function(){
+  var btn=document.getElementById('scrollTop');
+  if(window.scrollY>400)btn.classList.add('visible');
+  else btn.classList.remove('visible');
+});
+
+// Active nav link on scroll
+var sections=document.querySelectorAll('section[id], div[id]');
+var navLinks=document.querySelectorAll('.sidebar-nav a[href^="#"]');
+window.addEventListener('scroll',function(){
+  var scrollPos=window.scrollY+120;
+  navLinks.forEach(function(link){
+    var target=document.querySelector(link.getAttribute('href'));
+    if(target){
+      if(target.offsetTop<=scrollPos&&target.offsetTop+target.offsetHeight>scrollPos){
+        navLinks.forEach(function(l){l.classList.remove('active')});
+        link.classList.add('active');
+      }
+    }
+  });
+});
+
+// Smooth scroll for sidebar links
+document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var target=document.querySelector(this.getAttribute('href'));
+    if(target)window.scrollTo({top:target.offsetTop-30,behavior:'smooth'});
+  });
+});
+</script>
+
+</body>
+</html>
