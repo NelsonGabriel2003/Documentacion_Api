@@ -11,6 +11,7 @@
 html{scroll-behavior:smooth}
 body{font-family:'Source Sans Pro',sans-serif;color:var(--texto);background:var(--crema);line-height:1.7;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c5a9' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
 h1,h2,h3,h4,h5{font-family:'Playfair Display',serif;color:var(--verde)}
+.hero h1,.hero h2{color:#fff}
 /* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;background:linear-gradient(180deg,#1a3a0a 0%,var(--verde) 40%,#1f4010 100%);color:#fff;overflow-y:auto;z-index:1000;padding:20px 0;box-shadow:4px 0 20px rgba(0,0,0,0.2);transition:transform .3s ease}
 .sidebar::-webkit-scrollbar{width:6px}
@@ -161,7 +162,6 @@ tbody tr:nth-child(even){background:rgba(245,240,225,0.4)}
 <nav class="sidebar" id="sidebar">
 <div class="sidebar-header">
 <h3>LuluncotoApp</h3>
-<p>MiBarrio - API Docs</p>
 </div>
 <div class="sidebar-nav">
 <div class="nav-section">General</div>
@@ -227,7 +227,7 @@ tbody tr:nth-child(even){background:rgba(245,240,225,0.4)}
 </div>
 
 <div class="card">
-<h3 class="subsection-title">Diagrama de Arquitectura</h3>
+<h3 class="subsection-title">Proceso Lineal de la App</h3>
 <div class="arch-diagram">
 <div class="arch-flow">
 <div class="arch-box">
@@ -1209,104 +1209,6 @@ tbody tr:nth-child(even){background:rgba(245,240,225,0.4)}
 
 </section>
 
-<!-- ============================================================ -->
-<!-- MODELO DE DATOS -->
-<!-- ============================================================ -->
-<section class="section" id="modelo">
-<h2 class="section-title">Modelo de Datos (Entidad-Relacion)</h2>
-<p style="margin-bottom:25px">El siguiente diagrama muestra las 5 tablas principales del sistema con sus campos, tipos de dato y relaciones. Las claves primarias estan marcadas en amarillo y las claves foraneas en violeta.</p>
-
-<div class="er-container">
-
-<!-- users -->
-<div class="er-table">
-<div class="er-table-header">users</div>
-<div class="er-table-body">
-<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
-<div class="er-row"><span class="col-name">nombre <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
-<div class="er-row"><span class="col-name">email <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(60)</span></div>
-<div class="er-row"><span class="col-name">contrasena <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(200)</span></div>
-<div class="er-row"><span class="col-name">cedula <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(10)</span></div>
-<div class="er-row"><span class="col-name">celular</span><span class="col-type">VARCHAR(10)</span></div>
-<div class="er-row"><span class="col-name">fechade_nacimiento <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATE</span></div>
-<div class="er-row"><span class="col-name">foto_perfil</span><span class="col-type">VARCHAR(500)</span></div>
-<div class="er-row fk"><span class="col-name">rol_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; roles.id</span></div>
-<div class="er-row"><span class="col-name">creado_en</span><span class="col-type">DATETIME</span></div>
-</div>
-</div>
-
-<!-- roles -->
-<div class="er-table">
-<div class="er-table-header">roles</div>
-<div class="er-table-body">
-<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
-<div class="er-row"><span class="col-name">nombre <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(20)</span></div>
-</div>
-</div>
-
-<!-- categorias_reporte -->
-<div class="er-table">
-<div class="er-table-header">categorias_reporte</div>
-<div class="er-table-body">
-<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
-<div class="er-row"><span class="col-name">nombre <span class="er-badge uq-badge">UQ</span> <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
-<div class="er-row"><span class="col-name">descripcion</span><span class="col-type">VARCHAR(200)</span></div>
-<div class="er-row"><span class="col-name">es_predefinida <span class="er-badge nn-badge">NN</span></span><span class="col-type">BOOLEAN</span></div>
-</div>
-</div>
-
-<!-- reportes -->
-<div class="er-table">
-<div class="er-table-header">reportes</div>
-<div class="er-table-body">
-<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
-<div class="er-row"><span class="col-name">titulo <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(100)</span></div>
-<div class="er-row"><span class="col-name">descripcion <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(500)</span></div>
-<div class="er-row"><span class="col-name">foto_url</span><span class="col-type">VARCHAR(500)</span></div>
-<div class="er-row"><span class="col-name">latitud <span class="er-badge nn-badge">NN</span></span><span class="col-type">DOUBLE</span></div>
-<div class="er-row"><span class="col-name">longitud <span class="er-badge nn-badge">NN</span></span><span class="col-type">DOUBLE</span></div>
-<div class="er-row"><span class="col-name">estado <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(20)</span></div>
-<div class="er-row fk"><span class="col-name">categoria_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; categorias_reporte.id</span></div>
-<div class="er-row fk"><span class="col-name">usuario_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; users.id</span></div>
-<div class="er-row"><span class="col-name">creado_en <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
-<div class="er-row"><span class="col-name">actualizado_en <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
-</div>
-</div>
-
-<!-- historial_actividad -->
-<div class="er-table">
-<div class="er-table-header">historial_actividad</div>
-<div class="er-table-body">
-<div class="er-row pk"><span class="col-name">id <span class="er-badge pk-badge">PK</span></span><span class="col-type">BIGINT AUTO_INCREMENT</span></div>
-<div class="er-row fk"><span class="col-name">usuario_id <span class="er-badge fk-badge">FK</span></span><span class="col-type">BIGINT &rarr; users.id</span></div>
-<div class="er-row"><span class="col-name">accion <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
-<div class="er-row"><span class="col-name">entidad <span class="er-badge nn-badge">NN</span></span><span class="col-type">VARCHAR(50)</span></div>
-<div class="er-row"><span class="col-name">entidad_id</span><span class="col-type">BIGINT</span></div>
-<div class="er-row"><span class="col-name">detalle</span><span class="col-type">VARCHAR(500)</span></div>
-<div class="er-row"><span class="col-name">fecha_hora <span class="er-badge nn-badge">NN</span></span><span class="col-type">DATETIME</span></div>
-</div>
-</div>
-
-</div>
-
-<!-- ER Relations Legend -->
-<div class="card" style="margin-top:25px">
-<h4 style="margin-bottom:12px;font-size:1rem">Relaciones entre tablas</h4>
-<div style="display:flex;flex-wrap:wrap;gap:20px;font-size:.88rem">
-<div><span class="er-badge pk-badge" style="font-size:.72rem">PK</span> Clave Primaria</div>
-<div><span class="er-badge fk-badge" style="font-size:.72rem">FK</span> Clave Foranea</div>
-<div><span class="er-badge uq-badge" style="font-size:.72rem">UQ</span> Unico</div>
-<div><span class="er-badge nn-badge" style="font-size:.72rem">NN</span> Not Null</div>
-</div>
-<ul style="margin-top:15px;padding-left:20px;font-size:.88rem;line-height:2">
-<li><strong>users.rol_id</strong> &rarr; <strong>roles.id</strong> (ManyToOne: muchos usuarios pueden tener el mismo rol)</li>
-<li><strong>reportes.categoria_id</strong> &rarr; <strong>categorias_reporte.id</strong> (ManyToOne: un reporte pertenece a una categoria)</li>
-<li><strong>reportes.usuario_id</strong> &rarr; <strong>users.id</strong> (ManyToOne: un reporte pertenece a un usuario)</li>
-<li><strong>historial_actividad.usuario_id</strong> &rarr; <strong>users.id</strong> (ManyToOne: cada registro de historial tiene un usuario)</li>
-</ul>
-</div>
-
-</section>
 
 <!-- FOOTER -->
 <footer style="text-align:center;padding:40px 20px;border-top:2px solid var(--beige-oscuro);color:#888;font-size:.85rem">
@@ -1390,5 +1292,6 @@ document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(function(a){
 
 </body>
 </html>
+
 
 
