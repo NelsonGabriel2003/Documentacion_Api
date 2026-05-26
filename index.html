@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Práctica Técnico TI · Nelson Allauca</title>
+<meta name="description" content="Simulador interactivo de prueba técnica TI: hardware, redes y troubleshooting. UX/UI estilo Windows 11, mobile-first.">
+<style>
+  /* ===== Tokens estilo Windows 11 (Fluent) ===== */
+  :root{
+    --accent:#0067c0;
+    --accent-hover:#0078d4;
+    --bg:#f3f3f3;
+    --mica:rgba(255,255,255,.7);
+    --card:#ffffff;
+    --stroke:rgba(0,0,0,.08);
+    --text:#1b1b1b;
+    --text-soft:#5a5a5a;
+    --ok:#0f7b0f;
+    --err:#c42b1c;
+    --radius:8px;
+    --shadow:0 2px 8px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.08);
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#202020;--mica:rgba(43,43,43,.7);--card:#2b2b2b;
+      --stroke:rgba(255,255,255,.08);--text:#f3f3f3;--text-soft:#a9a9a9;
+      --accent:#4cc2ff;--accent-hover:#60caff;--shadow:0 2px 8px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(0,103,192,.18), transparent 60%),
+      radial-gradient(1000px 500px at -10% 110%, rgba(76,194,255,.12), transparent 60%),
+      var(--bg);
+    min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Barra superior tipo ventana Windows ===== */
+  .titlebar{
+    position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.6rem;
+    padding:.55rem .9rem;background:var(--mica);backdrop-filter:blur(20px) saturate(150%);
+    border-bottom:1px solid var(--stroke);
+  }
+  .titlebar .dot{width:12px;height:12px;border-radius:50%}
+  .traffic{display:flex;gap:.4rem;margin-right:.4rem}
+  .traffic .min{background:#ffbd44}.traffic .max{background:#00ca56}.traffic .close{background:#ff605c}
+  .titlebar h1{font-size:.85rem;font-weight:600;letter-spacing:.2px}
+  .titlebar .spacer{flex:1}
+  .winbtns{display:flex;gap:.1rem;color:var(--text-soft)}
+  .winbtns span{padding:.1rem .5rem;border-radius:4px;font-size:.8rem}
+
+  /* ===== Contenedor ===== */
+  .wrap{max-width:760px;margin:0 auto;padding:1rem .9rem 4rem}
+
+  /* ===== Hero ===== */
+  .hero{
+    background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:1.4rem 1.2rem;text-align:center;margin-bottom:1rem;
+  }
+  .hero .badge{
+    display:inline-block;font-size:.72rem;font-weight:600;color:var(--accent);
+    background:rgba(0,103,192,.12);padding:.25rem .7rem;border-radius:999px;margin-bottom:.7rem;
+  }
+  .hero h2{font-size:1.45rem;font-weight:700;margin-bottom:.4rem}
+  .hero p{color:var(--text-soft);font-size:.95rem;max-width:46ch;margin:0 auto}
+  .stats{display:flex;justify-content:center;gap:1.4rem;margin-top:1.1rem;flex-wrap:wrap}
+  .stat strong{display:block;font-size:1.3rem;color:var(--accent)}
+  .stat small{color:var(--text-soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
+
+  /* ===== Tabs segmentados (mobile-first) ===== */
+  .tabs{
+    display:flex;gap:.3rem;background:var(--card);border:1px solid var(--stroke);
+    border-radius:var(--radius);padding:.3rem;margin-bottom:1rem;box-shadow:var(--shadow);
+    position:sticky;top:50px;z-index:15;backdrop-filter:blur(20px);
+  }
+  .tab{
+    flex:1;border:none;background:transparent;color:var(--text-soft);font:inherit;
+    font-weight:600;font-size:.82rem;padding:.6rem .3rem;border-radius:6px;cursor:pointer;
+    transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:.15rem;
+  }
+  .tab .ic{font-size:1.05rem}
+  .tab[aria-selected="true"]{background:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(0,103,192,.35)}
+
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ===== Tarjetas ===== */
+  .card{
+    background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:1.1rem;margin-bottom:.9rem;
+  }
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+  .qhead .pill{font-size:.72rem;font-weight:600;color:var(--text-soft);background:var(--bg);padding:.2rem .6rem;border-radius:999px}
+  .progress{height:5px;background:var(--bg);border-radius:999px;overflow:hidden;margin-bottom:1rem}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hover));width:0;transition:width .3s}
+  .qtext{font-size:1.02rem;font-weight:600;margin-bottom:.9rem}
+
+  .opt{
+    display:block;width:100%;text-align:left;font:inherit;font-size:.92rem;
+    background:var(--card);border:1.5px solid var(--stroke);border-radius:6px;
+    padding:.75rem .85rem;margin-bottom:.55rem;cursor:pointer;color:var(--text);
+    transition:all .12s;display:flex;align-items:center;gap:.6rem;
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,103,192,.05)}
+  .opt .key{
+    flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--stroke);
+    display:grid;place-items:center;font-size:.78rem;font-weight:700;color:var(--text-soft);
+  }
+  .opt.correct{border-color:var(--ok);background:rgba(15,123,15,.10)}
+  .opt.correct .key{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .opt.wrong{border-color:var(--err);background:rgba(196,43,28,.10)}
+  .opt.wrong .key{background:var(--err);color:#fff;border-color:var(--err)}
+  .opt:disabled{cursor:default}
+  .explain{
+    font-size:.85rem;color:var(--text-soft);background:var(--bg);border-radius:6px;
+    padding:.7rem .8rem;margin-top:.3rem;border-left:3px solid var(--accent);display:none;
+  }
+  .explain.show{display:block;animation:fade .2s}
+
+  .btn{
+    font:inherit;font-weight:600;font-size:.9rem;border:none;cursor:pointer;
+    background:var(--accent);color:#fff;padding:.7rem 1.3rem;border-radius:6px;
+    transition:all .15s;box-shadow:0 2px 6px rgba(0,103,192,.3);
+  }
+  .btn:hover{background:var(--accent-hover)}
+  .btn.ghost{background:transparent;color:var(--accent);box-shadow:none;border:1.5px solid var(--accent)}
+  .btn:disabled{opacity:.4;cursor:default;box-shadow:none}
+  .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+
+  /* ===== Resultado ===== */
+  .result{text-align:center;padding:1.6rem 1.1rem}
+  .result .score{font-size:2.6rem;font-weight:800;color:var(--accent)}
+  .result .msg{color:var(--text-soft);margin:.5rem 0 1rem}
+
+  /* ===== Casos / acordeón ===== */
+  .case summary{
+    list-style:none;cursor:pointer;display:flex;align-items:center;gap:.7rem;
+    font-weight:600;font-size:.98rem;padding:.3rem 0;
+  }
+  .case summary::-webkit-details-marker{display:none}
+  .case .tag{
+    flex-shrink:0;font-size:.7rem;font-weight:700;color:#fff;background:var(--accent);
+    padding:.25rem .55rem;border-radius:5px;letter-spacing:.3px;
+  }
+  .case summary .chev{margin-left:auto;color:var(--text-soft);transition:transform .2s}
+  .case[open] summary .chev{transform:rotate(90deg)}
+  .case .body{padding:.7rem 0 .2rem}
+  .case .enun{font-size:.9rem;color:var(--text-soft);margin-bottom:.8rem}
+  .steps{list-style:none;counter-reset:s}
+  .steps li{
+    counter-increment:s;position:relative;padding:.55rem .6rem .55rem 2.4rem;
+    font-size:.88rem;margin-bottom:.4rem;background:var(--bg);border-radius:6px;
+  }
+  .steps li::before{
+    content:counter(s);position:absolute;left:.55rem;top:50%;transform:translateY(-50%);
+    width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:.72rem;font-weight:700;
+  }
+
+  /* ===== Bloque de código (origen Python) ===== */
+  .codecard pre{
+    background:#1e1e1e;color:#d4d4d4;border-radius:6px;padding:.9rem;overflow-x:auto;
+    font-family:"Cascadia Code",Consolas,"Courier New",monospace;font-size:.78rem;line-height:1.55;
+  }
+  .codecard .cmt{color:#6a9955}.codecard .kw{color:#569cd6}.codecard .str{color:#ce9178}.codecard .fn{color:#dcdcaa}
+
+  /* ===== Drive ===== */
+  .drive{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+  .drive .dico{
+    width:42px;height:42px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,#1da462,#ffcf00 60%,#4688f4);display:grid;place-items:center;
+    color:#fff;font-weight:800;font-size:1.1rem;
+  }
+  .drive .info{flex:1;min-width:160px}
+  .drive .info strong{display:block;font-size:.92rem}
+  .drive .info small{color:var(--text-soft);font-size:.78rem}
+
+  footer{text-align:center;color:var(--text-soft);font-size:.78rem;margin-top:1.5rem}
+  a{color:var(--accent)}
+  .h3{font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+  .sub{color:var(--text-soft);font-size:.85rem;margin-bottom:.9rem}
+</style>
+</head>
+<body>
+
+<!-- Barra de ventana Windows 11 -->
+<div class="titlebar">
+  <div class="traffic">
+    <span class="dot close"></span><span class="dot min"></span><span class="dot max"></span>
+  </div>
+  <h1>🛠️ Práctica Técnico TI — practica_tecnico_ti.exe</h1>
+  <div class="spacer"></div>
+  <div class="winbtns"><span>—</span><span>▢</span><span>✕</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="badge">PORTAFOLIO TÉCNICO · ENTREVISTA</span>
+    <h2>Simulador de Prueba Técnica TI</h2>
+    <p>Demuestro conocimientos prácticos de <strong>software, hardware y redes</strong> con un simulador interactivo de soporte y diagnóstico. — Nelson Gabriel Allauca</p>
+    <div class="stats">
+      <div class="stat"><strong>10</strong><small>Preguntas</small></div>
+      <div class="stat"><strong>5</strong><small>Casos reales</small></div>
+      <div class="stat"><strong>HW+SW</strong><small>Cobertura</small></div>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button class="tab" id="t-quiz" role="tab" aria-selected="true" onclick="showTab('quiz')"><span class="ic">📝</span>Quiz</button>
+    <button class="tab" id="t-casos" role="tab" aria-selected="false" onclick="showTab('casos')"><span class="ic">🧩</span>Casos</button>
+    <button class="tab" id="t-docs" role="tab" aria-selected="false" onclick="showTab('docs')"><span class="ic">📚</span>Docs</button>
+    <button class="tab" id="t-drive" role="tab" aria-selected="false" onclick="showTab('drive')"><span class="ic">📁</span>Drive</button>
+  </div>
+
+  <!-- PANEL QUIZ -->
+  <section class="panel active" id="p-quiz">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="card" id="quizCard"></div>
+  </section>
+
+  <!-- PANEL CASOS -->
+  <section class="panel" id="p-casos">
+    <div class="card">
+      <div class="h3">Casos de troubleshooting</div>
+      <div class="sub">Método de diagnóstico paso a paso — de lo simple a lo complejo. Toca cada caso para ver la solución modelo.</div>
+      <div id="casosBox"></div>
+    </div>
+  </section>
+
+  <!-- PANEL DOCUMENTACIÓN -->
+  <section class="panel" id="p-docs">
+    <div class="card">
+      <div class="h3">Documentación de referencia</div>
+      <div class="sub">Fuentes oficiales que consulto y aplico en soporte. Sirven para verificar procedimientos y respaldar cada decisión técnica.</div>
+      <div id="docsBox"></div>
+    </div>
+    <div class="card">
+      <div class="h3">Cómo trabajo un caso</div>
+      <div class="sub">Mi método ante cualquier incidencia, alineado con buenas prácticas de soporte.</div>
+      <ol class="steps" style="margin-top:.2rem">
+        <li>Registrar el síntoma y reproducir el problema.</li>
+        <li>Aislar por capas: físico → red → sistema → aplicación.</li>
+        <li>Consultar la documentación oficial antes de aplicar cambios.</li>
+        <li>Resolver de lo simple/barato a lo complejo.</li>
+        <li>Verificar la solución y documentar para futuros casos.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PANEL DRIVE -->
+  <section class="panel" id="p-drive">
+    <div class="card">
+      <div class="h3">Documento de respaldo</div>
+      <div class="sub">Guía de estudio y CV técnico alojados en Google Drive.</div>
+      <div class="drive">
+        <div class="dico">▶</div>
+        <div class="info">
+          <strong>Documentación técnica — Nelson Allauca</strong>
+          <small id="driveSub">Pega aquí el enlace de tu Drive cuando lo tengas.</small>
+        </div>
+        <a id="driveLink" class="btn" href="#" target="_blank" rel="noopener" style="display:none">Abrir en Drive</a>
+      </div>
+      <p style="margin-top:.9rem;font-size:.82rem;color:var(--text-soft)">
+        💡 Cuando me pases el link, reemplazo <code>DRIVE_URL</code> en el código y el botón queda activo.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Hecho con HTML, CSS y JavaScript · UX/UI estilo Windows 11 · Mobile-first<br>
+    © <span id="year"></span> Nelson Gabriel Allauca — Tecnólogo en Desarrollo de Software
+  </footer>
+</div>
+
+<script>
+/* ====== DATOS (portados de practica_tecnico_ti.py) ====== */
+const QUIZ = [
+  ["Un PC enciende (ventiladores giran) pero NO da imagen. ¿Cuál es la causa MENOS probable a revisar primero?",
+   ["RAM mal asentada","Cable de video / monitor","Tarjeta de video","El disco duro está lleno"],3,
+   "Si no hay imagen ni POST, el disco no influye. Se revisa RAM, video y conexiones del monitor."],
+  ["¿Qué comando muestra la configuración de red COMPLETA en Windows?",
+   ["ping","ipconfig /all","tracert","netstat"],1,
+   "ipconfig /all muestra IP, máscara, gateway, DNS y MAC."],
+  ["Sin internet pero con cable conectado. ¿PRIMER comando para descartar DNS vs conectividad?",
+   ["ping 8.8.8.8","chkdsk","sfc /scannow","tasklist"],0,
+   "ping a una IP prueba conectividad pura. Si responde por IP pero no por nombre, es DNS."],
+  ["¿Cuál es el sistema de archivos típico de Windows?",
+   ["EXT4","NTFS","APFS","FAT12"],1,
+   "NTFS es el estándar de Windows moderno."],
+  ["¿Qué ventaja principal tiene un SSD sobre un HDD?",
+   ["Mayor capacidad siempre","Es más barato","Mucho mayor velocidad de lectura/escritura","No necesita energía"],2,
+   "El SSD no tiene partes móviles: arranque y carga mucho más rápidos."],
+  ["La norma de ponchado de cable de red más utilizada es:",
+   ["T568B","RJ11","DDR4","HDMI"],0,
+   "T568B es la norma de cableado más común para RJ45."],
+  ["¿Qué hace el comando 'sfc /scannow'?",
+   ["Formatea el disco","Repara archivos del sistema dañados","Renueva la IP","Lista procesos"],1,
+   "System File Checker verifica y repara archivos del sistema."],
+  ["Un PC se reinicia solo de forma aleatoria. Causa MÁS probable:",
+   ["Falta actualizar Office","Sobrecalentamiento o fuente defectuosa","El teclado está desconectado","El monitor es viejo"],1,
+   "Reinicios aleatorios suelen ser temperatura (limpieza/pasta) o fuente."],
+  ["¿Qué protocolo asigna direcciones IP automáticamente?",
+   ["DNS","DHCP","HTTP","FTP"],1,
+   "DHCP asigna IP, máscara, gateway y DNS automáticamente."],
+  ["Antes de formatear el equipo de un usuario, lo PRIMERO es:",
+   ["Reiniciar el router","Respaldar la información del usuario","Cambiar la fuente","Actualizar la BIOS"],1,
+   "Siempre respaldar datos antes de formatear: es irreversible."]
+];
+
+const CASOS = [
+  ["CASO 1","PC LENTO","Un usuario reporta que su computador va MUY lento desde hace una semana. ¿Cómo lo diagnosticas?",
+   ["Preguntar: ¿cuándo empezó?, ¿se instaló algo?, ¿hay mensajes?",
+    "Revisar uso de CPU/RAM/disco en el Administrador de tareas.",
+    "Revisar programas que arrancan con Windows (pestaña Inicio).",
+    "Verificar espacio libre en disco (disco lleno = lentitud).",
+    "Ejecutar análisis de antivirus (posible malware).",
+    "Considerar migrar a SSD o ampliar RAM si el hardware es antiguo.",
+    "Documentar lo realizado."]],
+  ["CASO 2","SIN INTERNET","No tiene internet pero el cable está conectado y el led de red enciende. ¿Cómo lo diagnosticas?",
+   ["Verificar conexión física y led del puerto/switch.",
+    "ipconfig /all → ¿IP válida o una 169.254.x.x (sin DHCP)?",
+    "ping 8.8.8.8 → prueba conectividad por IP.",
+    "ping google.com → si falla aquí pero la IP responde, es DNS.",
+    "ipconfig /release y /renew para renovar IP.",
+    "ipconfig /flushdns si es problema de DNS.",
+    "Probar otro cable/puerto; revisar el router si afecta a todos."]],
+  ["CASO 3","NO ENCIENDE","Al pulsar el botón no pasa absolutamente nada. ¿Qué revisas y en qué orden?",
+   ["Confirmar energía en el tomacorriente (probar otro equipo).",
+    "Revisar cable de poder y el switch trasero de la fuente.",
+    "Verificar el botón de encendido y sus conexiones a la placa.",
+    "Probar/descartar la fuente de poder (causa muy común).",
+    "Reasentar la RAM y conectores de poder de la placa.",
+    "Ir de lo simple y barato a lo complejo."]],
+  ["CASO 4","IMPRESORA EN RED","Instalar una impresora en red para varios usuarios. ¿Cómo procedes?",
+   ["Obtener la IP de la impresora (panel o router).",
+    "Verificar que impresora y PCs estén en la misma red.",
+    "Agregar impresora → por TCP/IP → ingresar la IP.",
+    "Instalar el driver correcto del modelo.",
+    "Imprimir página de prueba para confirmar.",
+    "Repetir/compartir en los demás equipos."]],
+  ["CASO 5","PANTALLA AZUL (BSOD)","Pantallas azules frecuentes. ¿Cómo lo abordas?",
+   ["Anotar el código/mensaje de error de la pantalla azul.",
+    "Preguntar si se instaló hardware o drivers recientemente.",
+    "Iniciar en Modo Seguro para aislar drivers/software.",
+    "Probar la RAM (diagnóstico de memoria de Windows).",
+    "Ejecutar chkdsk y sfc /scannow.",
+    "Actualizar o revertir drivers sospechosos.",
+    "Revisar temperatura si hay reinicios asociados."]]
+];
+
+/* ====== Documentación de referencia (fuentes oficiales) ====== */
+const DOCS = [
+  ["🪟","Soporte oficial de Microsoft","Guías paso a paso de Windows, errores y configuración.","https://support.microsoft.com/es-es/windows"],
+  ["📘","Microsoft Learn","Cursos y rutas de Windows, redes y administración de sistemas.","https://learn.microsoft.com/es-es/"],
+  ["⚙️","Comandos de red (ipconfig, ping…)","Referencia de comandos de Windows para diagnóstico de red.","https://learn.microsoft.com/es-es/windows-server/administration/windows-commands/ipconfig"],
+  ["🟦","Códigos de pantalla azul (BSOD)","Listado y resolución de errores STOP de Windows.","https://learn.microsoft.com/es-es/windows-hardware/drivers/debugger/bug-check-code-reference2"],
+  ["🌐","Cableado estructurado T568A/B","Estándar de ponchado RJ45 (referencia técnica).","https://es.wikipedia.org/wiki/TIA-568B"],
+  ["🛡️","CompTIA A+ (fundamentos TI)","Temario de referencia para soporte de hardware y software.","https://www.comptia.org/es/certificaciones/a"]
+];
+
+/* ====== CONFIG DRIVE — reemplaza cuando tengas el enlace ====== */
+const DRIVE_URL = "https://docs.google.com/document/d/1mAZR5m8ysaNrFzjN2aWm8MHA0fdmDD3y/edit?usp=drive_link&ouid=113999757384760933591&rtpof=true&sd=true";
+
+/* ====== Navegación tabs ====== */
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected','false'));
+  document.getElementById('p-'+name).classList.add('active');
+  document.getElementById('t-'+name).setAttribute('aria-selected','true');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ====== Lógica del Quiz ====== */
+let order=[...QUIZ.keys()].sort(()=>Math.random()-.5);
+let idx=0, aciertos=0, answered=false;
+const letras=["a","b","c","d"];
+
+function renderQuiz(){
+  const card=document.getElementById('quizCard');
+  document.getElementById('bar').style.width=(idx/QUIZ.length*100)+'%';
+  if(idx>=QUIZ.length){ renderResult(); return; }
+  const [preg,ops,correcta,expl]=QUIZ[order[idx]];
+  answered=false;
+  card.innerHTML=`
+    <div class="qhead"><span class="pill">Pregunta ${idx+1} de ${QUIZ.length}</span><span class="pill">Aciertos: ${aciertos}</span></div>
+    <div class="qtext">${preg}</div>
+    <div id="opts">${ops.map((o,j)=>`
+      <button class="opt" data-j="${j}" onclick="answer(${j},${correcta})">
+        <span class="key">${letras[j]}</span><span>${o}</span>
+      </button>`).join('')}</div>
+    <div class="explain" id="exp"><strong>Explicación:</strong> ${expl}</div>
+    <div class="row" style="margin-top:.9rem">
+      <button class="btn" id="next" onclick="next()" disabled>Siguiente →</button>
+    </div>`;
+}
+function answer(j,correcta){
+  if(answered) return; answered=true;
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach(b=>{ b.disabled=true;
+    const k=+b.dataset.j;
+    if(k===correcta) b.classList.add('correct');
+    if(k===j && j!==correcta) b.classList.add('wrong');
+  });
+  if(j===correcta) aciertos++;
+  document.getElementById('exp').classList.add('show');
+  document.getElementById('next').disabled=false;
+}
+function next(){ idx++; renderQuiz(); }
+function renderResult(){
+  document.getElementById('bar').style.width='100%';
+  const pct=Math.round(aciertos/QUIZ.length*100);
+  let msg = pct===100?"¡Excelente, dominas los fundamentos!":
+            pct>=60?"Bien, repasa los temas que fallaste.":
+                    "Necesitas reforzar. Revisa la guía de estudio.";
+  document.getElementById('quizCard').innerHTML=`
+    <div class="result">
+      <div class="score">${aciertos}/${QUIZ.length}</div>
+      <div class="msg">${pct}% — ${msg}</div>
+      <button class="btn" onclick="restart()">↻ Reintentar</button>
+    </div>`;
+}
+function restart(){ order=[...QUIZ.keys()].sort(()=>Math.random()-.5); idx=0; aciertos=0; renderQuiz(); }
+
+/* ====== Render Casos ====== */
+function renderCasos(){
+  document.getElementById('casosBox').innerHTML=CASOS.map(([n,t,enun,pasos],i)=>`
+    <details class="case" ${i===0?'open':''} style="border-top:1px solid var(--stroke);padding:.7rem 0">
+      <summary><span class="tag">${n}</span> ${t} <span class="chev">›</span></summary>
+      <div class="body">
+        <div class="enun">${enun}</div>
+        <ol class="steps">${pasos.map(p=>`<li>${p}</li>`).join('')}</ol>
+      </div>
+    </details>`).join('');
+}
+
+/* ====== Render Docs ====== */
+function renderDocs(){
+  document.getElementById('docsBox').innerHTML=DOCS.map(([ic,t,d,url])=>`
+    <a class="drive" href="${url}" target="_blank" rel="noopener"
+       style="text-decoration:none;color:inherit;padding:.6rem 0;border-top:1px solid var(--stroke)">
+      <div class="dico" style="background:var(--bg);color:var(--accent);font-size:1.2rem">${ic}</div>
+      <div class="info"><strong>${t}</strong><small>${d}</small></div>
+      <span class="chev" style="color:var(--accent);font-weight:700">↗</span>
+    </a>`).join('');
+}
+
+/* ====== Drive ====== */
+function initDrive(){
+  if(DRIVE_URL){
+    const a=document.getElementById('driveLink');
+    a.href=DRIVE_URL; a.style.display='inline-block';
+    document.getElementById('driveSub').textContent='Documento disponible — clic para abrir.';
+  }
+}
+
+/* ====== Init ====== */
+document.getElementById('year').textContent=new Date().getFullYear();
+renderQuiz(); renderCasos(); renderDocs(); initDrive();
+</script>
+</body>
+</html>
